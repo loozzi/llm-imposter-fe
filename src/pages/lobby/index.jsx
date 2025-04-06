@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '../../components/common/button'
+import { history } from '../../configs/history'
 
 export const LobbyPage = () => {
   const [teams, setTeams] = useState([
@@ -15,6 +16,7 @@ export const LobbyPage = () => {
   const handleStartGame = () => {
     console.log('Starting game...')
     // Logic to start the game goes here
+    history.push('/game')
   }
 
   useEffect(() => {
