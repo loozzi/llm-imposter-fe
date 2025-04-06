@@ -4,6 +4,7 @@ import { AnswerPage } from './pages/answer'
 import { GamePage } from './pages/game'
 import { HomePage } from './pages/home'
 import { ScoreBoardPage } from './pages/score_board'
+import { LobbyPage } from './pages/lobby'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path='/game' element={<GamePage />} />
       <Route path='/answer/:team_uid' element={<AnswerPage />} />
       <Route path='/score_board' element={<ScoreBoardPage />} />
+      <Route path='/lobby' element={<LobbyPage />} />
     </Routes>
   )
 }
