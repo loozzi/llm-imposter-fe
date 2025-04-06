@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { Button } from '../../components/common/button'
+import { history } from '../../configs/history'
 
 const formatTime = (seconds) => {
   const minutes = Math.floor(seconds / 60)
@@ -51,6 +53,11 @@ export const GamePage = () => {
 
     fetchGameData()
   }, [])
+
+  const handleRedirectToScoreBoard = () => {
+    // Redirect to score board page
+    history.push('/score_board')
+  }
 
   useEffect(() => {
     let myInterval = setInterval(() => {
@@ -116,7 +123,7 @@ export const GamePage = () => {
         }}
       >
         <h2>Câu trả lời của các đội:</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: 600, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: 540, overflowY: 'auto' }}>
           {answers.map((answer, index) => (
             <div
               key={index}
@@ -145,6 +152,17 @@ export const GamePage = () => {
           ))}
         </div>
       </div>
+      <Button
+        style={{
+          marginTop: 20,
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}
+        onClick={handleRedirectToScoreBoard}
+      >
+        Xem kết quả
+      </Button>
     </div>
   )
 }
