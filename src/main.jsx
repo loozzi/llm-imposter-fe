@@ -6,9 +6,9 @@ import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 import { history } from './configs/history.js'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <HistoryRouter history={history}>
-      <App />
-    </HistoryRouter>
-  </StrictMode>
+  // <StrictMode>
+  <HistoryRouter history={history}>
+    <App />
+  </HistoryRouter>
+  // </StrictMode>
 )

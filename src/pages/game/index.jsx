@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '../../components/common/button'
 import { history } from '../../configs/history'
+import gameService from '../../services/game.service'
 
 const formatTime = (seconds) => {
   const minutes = Math.floor(seconds / 60)
@@ -10,45 +11,20 @@ const formatTime = (seconds) => {
 
 export const GamePage = () => {
   const [timeRemaining, setTimeRemaining] = useState(114)
-  const [question, setQuestion] = useState(
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-  )
-  const [answers, setAnswers] = useState([
-    {
-      team: 'Team 1',
-      answer:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-    },
-    {
-      team: 'Team 2',
-      answer:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-    },
-    {
-      team: 'Team 3',
-      answer:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-    },
-    {
-      team: 'Team 4',
-      answer:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-    },
-    {
-      team: 'Team 5',
-      answer:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum esse molestias sapiente totam qui quasi nesciunt provident doloribus quo? Eligendi, consectetur explicabo. Ullam numquam commodi nemo fugiat expedita, sed facilis?'
-    }
-  ])
+  const [question, setQuestion] = useState('')
+  const [answers, setAnswers] = useState([])
+  const [players, setPlayers] = useState([])
 
   useEffect(() => {
     const fetchGameData = async () => {
-      // Simulate fetching game data from an API
-      const response = await fetch('https://api.example.com/game')
-      const data = await response.json()
-      setTimeRemaining(data.timeRemaining)
-      setQuestion(data.question)
-      setAnswers(data.answers)
+      gameService
+        .nextTurn()
+        .then((res) => {
+          console.log('res', res)
+        })
+        .catch((err) => {
+          console.log('err', err)
+        })
     }
 
     fetchGameData()
@@ -62,9 +38,19 @@ export const GamePage = () => {
   useEffect(() => {
     let myInterval = setInterval(() => {
       if (timeRemaining > 0) {
-        setTimeRemaining(timeRemaining - 1)
-        // get answer from api
-        // setAnswers((prevAnswers) => [...prevAnswers, newAnswer])
+        // setTimeRemaining(timeRemaining - 1)
+        gameService.getGameState().then((res) => {
+          console.log('res', res)
+          if (res) {
+            setQuestion(res.current_question || '')
+            setTimeRemaining(res.remaining_time)
+            setAnswers(res.answers)
+            setPlayers(res.players)
+          } else {
+            alert('Lấy dữ liệu game thất bại')
+            history.push('/')
+          }
+        })
       }
       if (timeRemaining === 0) {
         history.push('/score_board')
@@ -85,7 +71,7 @@ export const GamePage = () => {
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', gap: 28, justifyContent: 'flex-start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start', width: 250 }}>
           <span
             style={{
               fontSize: 120
@@ -98,13 +84,14 @@ export const GamePage = () => {
               fontSize: 28
             }}
           >
-            #5 đội còn lại
+            {`#${players.filter((e) => !e.eliminated).length}`} đội còn lại
           </span>
         </div>
         <div
           style={{
             fontSize: 40,
-            textAlign: 'left'
+            textAlign: 'left',
+            flex: 1
           }}
         >
           Câu hỏi: {question}
@@ -119,7 +106,8 @@ export const GamePage = () => {
           marginTop: 32,
           borderRadius: 8,
           backgroundColor: '#f0f0f0',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          minWidth: 600
         }}
       >
         <h2>Câu trả lời của các đội:</h2>
@@ -142,10 +130,11 @@ export const GamePage = () => {
                 style={{
                   fontWeight: 'bold',
                   marginRight: 8,
-                  width: 120
+                  width: 120,
+                  textAlign: 'left'
                 }}
               >
-                {answer.team}:
+                {players.find((player) => player.id === answer.player_id)?.name || 'Đội chơi'}:
               </span>
               <span>{answer.answer}</span>
             </div>

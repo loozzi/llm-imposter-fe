@@ -1,33 +1,47 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '../../components/common/button'
 import { history } from '../../configs/history'
+import gameService from '../../services/game.service'
+import qrImage from '../../assets/qr.jpg'
+import avatars from '../../assets/avatars'
 
 export const LobbyPage = () => {
-  const [teams, setTeams] = useState([
-    { name: 'Team A', uid: '123' },
-    { name: 'Team B', uid: '456' },
-    { name: 'Team C', uid: '789' },
-    { name: 'Team D', uid: '101' },
-    { name: 'Team E', uid: '112' }
-  ])
-
-  const [qrCode, setQrCode] = useState('')
+  const [teams, setTeams] = useState([])
+  const [teamNames, setTeamNames] = useState([])
 
   const handleStartGame = () => {
-    console.log('Starting game...')
-    // Logic to start the game goes here
-    history.push('/game')
+    gameService.startGame().then((res) => {
+      console.log('res', res)
+      if (res) {
+        history.push('/game')
+      } else {
+        alert('Bắt đầu game thất bại')
+      }
+    })
   }
 
   useEffect(() => {
-    // Simulate fetching QR code from server
-    const fetchQrCode = async () => {
-      // Replace with actual API call
-      const qrCodeData = 'https://example.com/qr-code'
-      setQrCode(qrCodeData)
+    const fetchTeams = async () => {
+      try {
+        const response = await gameService.getActivePlayers()
+        try {
+          setTeams(response.active_player_ids)
+          setTeamNames(response.active_player_names)
+        } catch (error) {
+          alert('Lấy danh sách đội chơi thất bại')
+          console.error('Error fetching teams:', error)
+        }
+      } catch (error) {
+        console.error('Error fetching teams:', error)
+      }
     }
 
-    fetchQrCode()
+    fetchTeams()
+    const interval = setInterval(() => {
+      fetchTeams()
+    }, 2000) // Fetch teams every 2 seconds
+
+    return () => clearInterval(interval) // Cleanup interval on component unmount
   }, [])
 
   return (
@@ -51,7 +65,7 @@ export const LobbyPage = () => {
             alignItems: 'center'
           }}
         >
-          {/* QR code here */}
+          <img src={qrImage} alt='QR Code' style={{ width: '100%', height: '100%' }} />
         </div>
       </div>
       <div
@@ -75,15 +89,32 @@ export const LobbyPage = () => {
               <div
                 key={team.uid}
                 style={{
-                  width: 128,
-                  height: 128,
                   display: 'flex',
-                  justifyContent: 'center',
                   alignItems: 'center',
-                  backgroundColor: '#f0f0f0'
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  width: 128,
+
+                  height: 'auto'
                 }}
               >
-                {team.name}
+                <div
+                  style={{
+                    width: 128,
+                    height: 128,
+                    overflow: 'hidden',
+                    backgroundImage: `url(${avatars[index % avatars.length]})`,
+                    backgroundSize: 'cover',
+                    marginBottom: 10
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 28
+                  }}
+                >
+                  {teamNames[index]}
+                </span>
               </div>
             ))}
           </div>
