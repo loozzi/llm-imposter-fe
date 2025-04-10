@@ -151,7 +151,9 @@ export const AnswerPage = () => {
                 display: 'block',
                 marginBottom: 20,
                 marginTop: 20,
-                textAlign: 'start'
+                textAlign: 'start',
+                userSelect: 'none',
+                pointerEvents: 'none'
               }}
             >
               Câu hỏi: {question}
@@ -161,7 +163,7 @@ export const AnswerPage = () => {
               style={{
                 width: 'calc(100% - 60px)',
                 height: 400,
-                fontSize: 24,
+                fontSize: 20,
                 padding: 20,
                 borderRadius: 8,
                 border: '1px solid #ccc',
