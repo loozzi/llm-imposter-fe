@@ -63,16 +63,18 @@ export const GamePage = () => {
             }
           })
         }
-        if (timeRemaining === 0) {
-          history.push('/score_board')
-          clearInterval(myInterval)
-        }
       }, 1000)
       return () => {
         clearInterval(myInterval)
       }
     }
   }, [isNextTurn])
+
+  useEffect(() => {
+    if (timeRemaining === 0) {
+      history.push('/score_board')
+    }
+  }, [timeRemaining])
 
   if (isNextTurn)
     return (
