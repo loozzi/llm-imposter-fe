@@ -1,19 +1,51 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../../components/common/button'
 import { history } from '../../configs/history'
+import gameService from '../../services/game.service'
+import './score_board.css'
 
 export const ScoreBoardPage = () => {
-  const [scores, setScores] = useState([
-    { team: 'Team A', score: 70, answer: 'Answer A' },
-    { team: 'Team B', score: 63, answer: 'Answer B' },
-    { team: 'Team C', score: 49, answer: 'Answer C' },
-    { team: 'Team D', score: 35, answer: 'Answer D' },
-    { team: 'Team E', score: 17, answer: 'Answer E' }
-  ])
+  const [scores, setScores] = useState([])
+
+  const [winner, setWinner] = useState('')
+  const [players, setPlayers] = useState([])
 
   const handleContinue = () => {
     history.push('/game')
   }
+
+  useEffect(() => {
+    gameService
+      .ranking()
+      .then((res) => {
+        console.log('res', res)
+        if (res) {
+          setScores(res.scores.sort((a, b) => b.rank - a.rank))
+          setPlayers(res.players)
+        } else {
+          alert('Lấy dữ liệu game thất bại')
+        }
+      })
+      .catch((err) => {
+        console.log('err', err)
+        alert('Lấy dữ liệu game thất bại')
+      })
+  }, [])
+
+  useEffect(() => {
+    if (scores.length > 0) {
+      const badScorePlayer = scores[scores.length - 1].player_id
+
+      gameService
+        .eliminatePlayer(badScorePlayer)
+        .then((res) => {
+          console.log('res', res)
+        })
+        .catch((err) => {
+          console.log('err', err)
+        })
+    }
+  }, [scores])
 
   return (
     <div
@@ -50,9 +82,9 @@ export const ScoreBoardPage = () => {
                 background: index === 0 ? '#91EE66' : index === scores.length - 1 ? '#f44336' : 'inherit'
               }}
             >
-              <td>{item.team}</td>
-              <td>{item.answer}</td>
-              <td>{item.score}</td>
+              <td>{players.find((p) => p.id === item.player_id).name}</td>
+              <td className='answer-text'>{item.answer}</td>
+              <td>{item.rank}</td>
             </tr>
           ))}
         </tbody>

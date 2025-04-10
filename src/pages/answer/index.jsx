@@ -31,6 +31,11 @@ export const AnswerPage = () => {
             return
           }
 
+          if (res.question !== question) {
+            setAnswered(false)
+            setAnswer('')
+          }
+
           setQuestion(res.current_question || '')
           setTimeRemaining(res.remaining_time)
           setPlayers(res.players)
@@ -77,7 +82,7 @@ export const AnswerPage = () => {
         setTimeRemaining(timeRemaining - 1)
       }
       if (timeRemaining === 0) {
-        handleSubmitAnswer()
+        if (!answered) handleSubmitAnswer()
         clearInterval(myInterval)
         setAnswered(true)
         // setPlayerStatus('Thời gian đã hết')
@@ -105,7 +110,7 @@ export const AnswerPage = () => {
       >
         <span
           style={{
-            fontSize: 24,
+            fontSize: 64,
             fontWeight: 'bold',
             display: 'block',
             marginBottom: 20,

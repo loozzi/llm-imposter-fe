@@ -16,7 +16,7 @@ export const HomePage = () => {
 
     const payload = {
       min_players: 1,
-      answer_timeout: answerTimeout
+      answer_timeout: parseInt(answerTimeout)
     }
     gameService.createGame(payload).then((res) => {
       console.log('res', res)

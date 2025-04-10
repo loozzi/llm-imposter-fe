@@ -84,6 +84,37 @@ class GameService {
             throw error;
         }
     }
+
+    async ranking() {
+        try {
+            const response = await this.axios.post('/rank_answers');
+            return response;
+        }
+        catch (error) {
+            console.error('Error fetching ranking:', error);
+            throw error;
+        }
+    }
+
+    async playTurnAI() {
+        try {
+            const response = await this.axios.post('/play_turn_ai');
+            return response;
+        } catch (error) {
+            console.error('Error playing turn AI:', error);
+            throw error;
+        }
+    }
+
+    async eliminatePlayer(playerId) {
+        try {
+            const response = await this.axios.post('/eliminate_player', { player_id: playerId });
+            return response;
+        } catch (error) {
+            console.error('Error eliminating player:', error);
+            throw error;
+        }
+    }
 }
 
 const gameService = new GameService(axiosInstance);
